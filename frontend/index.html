@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Skyway — Flight Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#"><span class="brand-icon">✈</span><span>skyway<span class="brand-dot">.</span><small>FLIGHT OPERATIONS</small></span></a>
+    <div class="nav-label">WORKSPACE</div>
+    <button class="nav-item active" data-view="overview"><span>▦</span> Overview</button>
+    <button class="nav-item" data-view="flights"><span>✈</span> Find flights</button>
+    <button class="nav-item" data-view="bookings"><span>▤</span> Bookings</button>
+    <div class="sidebar-bottom"><div class="status-dot"></div><div><b>System status</b><small id="api-status">Connecting to API…</small></div></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div><div class="eyebrow">FLIGHT MANAGEMENT SYSTEM</div><h1 id="page-title">Good afternoon<span class="title-dot">.</span></h1></div>
+      <div class="top-actions"><span class="today" id="today"></span><div class="avatar">AD</div></div>
+    </header>
+
+    <section id="overview-view" class="view">
+      <div class="hero">
+        <div class="hero-copy"><span class="hero-kicker"><span class="spark">✦</span> YOUR JOURNEY STARTS HERE</span>
+          <h2>Every journey,<br><em>beautifully connected.</em></h2>
+          <p>Search routes, explore flight schedules and manage your bookings from one place.</p>
+          <button class="button button-light" id="hero-search">Explore flights <span>↗</span></button>
+        </div>
+        <div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="plane">✈</div><div class="route-label label-a">PNQ <small>PUNE</small></div><div class="route-label label-b">DEL <small>NEW DELHI</small></div><div class="route-line"></div><div class="hero-chip">✦ &nbsp; YOUR NEXT ADVENTURE</div></div>
+      </div>
+
+      <div class="section-heading"><div><div class="eyebrow">AT A GLANCE</div><h3>Operations overview</h3></div><span class="live-tag"><span></span> LIVE DATA</span></div>
+      <div class="stats-grid">
+        <article class="stat-card"><div class="stat-top"><span>Active flights</span><span class="stat-icon blue">✈</span></div><div class="stat-value" id="stat-flights">—</div><div class="stat-note">Scheduled and delayed</div></article>
+        <article class="stat-card"><div class="stat-top"><span>Passengers</span><span class="stat-icon purple">♙</span></div><div class="stat-value" id="stat-passengers">—</div><div class="stat-note">Registered travellers</div></article>
+        <article class="stat-card"><div class="stat-top"><span>Confirmed bookings</span><span class="stat-icon green">✓</span></div><div class="stat-value" id="stat-bookings">—</div><div class="stat-note">Ready for departure</div></article>
+        <article class="stat-card"><div class="stat-top"><span>Recorded revenue</span><span class="stat-icon amber">₹</span></div><div class="stat-value" id="stat-revenue">—</div><div class="stat-note">Successful demo payments</div></article>
+      </div>
+
+      <div class="section-heading section-heading-table"><div><div class="eyebrow">UPCOMING ROUTES</div><h3>Explore the schedule</h3></div><button class="text-button" id="all-flights">View all flights <span>→</span></button></div>
+      <div id="preview-flights" class="flight-list"><div class="loading">Loading flight schedule…</div></div>
+    </section>
+
+    <section id="flights-view" class="view hidden">
+      <div class="page-intro"><div class="eyebrow">PLAN YOUR TRIP</div><h2>Find your next flight<span class="title-dot">.</span></h2><p>Choose your route and travel date to see available flights.</p></div>
+      <form id="search-form" class="search-panel">
+        <label>FROM <select id="origin"><option value="">Any airport</option></select></label>
+        <div class="swap-icon">⇄</div>
+        <label>TO <select id="destination"><option value="">Any airport</option></select></label>
+        <label>DEPARTURE DATE <input id="travel-date" type="date"></label>
+        <button class="button button-primary" type="submit">Search flights <span>→</span></button>
+      </form>
+      <div class="results-heading"><h3>Available flights</h3><span id="result-count">Loading…</span></div>
+      <div id="flight-results" class="flight-list"><div class="loading">Loading flights…</div></div>
+    </section>
+
+    <section id="bookings-view" class="view hidden">
+      <div class="page-intro"><div class="eyebrow">TRAVELLER MANAGEMENT</div><h2>Bookings & tickets<span class="title-dot">.</span></h2><p>Review booking status, assigned seats, tickets and payment records.</p></div>
+      <div class="table-wrap"><table><thead><tr><th>BOOKING</th><th>PASSENGER</th><th>FLIGHT / ROUTE</th><th>SEAT</th><th>FARE</th><th>STATUS</th><th>TICKET</th></tr></thead><tbody id="booking-rows"><tr><td colspan="7" class="loading">Loading bookings…</td></tr></tbody></table></div>
+    </section>
+
+    <footer><span>SKYWAY <b>·</b> FLIGHT MANAGEMENT SYSTEM</span><span>Built with MySQL + Flask</span></footer>
+  </main>
+
+  <dialog id="booking-dialog" class="booking-dialog">
+    <form id="booking-form" method="dialog">
+      <div class="dialog-top"><div><div class="eyebrow">RESERVE YOUR SEAT</div><h2>Passenger details</h2></div><button type="button" class="close-button" id="close-dialog">×</button></div>
+      <div id="selected-flight" class="selected-flight"></div>
+      <input type="hidden" id="selected-flight-id">
+      <div class="form-grid">
+        <label class="wide">Full name<input id="passenger-name" required maxlength="120" placeholder="e.g. Aarav Mehta"></label>
+        <label>Date of birth<input id="passenger-dob" type="date" required></label>
+        <label>Gender<select id="passenger-gender"><option value="PREFER_NOT_TO_SAY">Prefer not to say</option><option value="FEMALE">Female</option><option value="MALE">Male</option><option value="OTHER">Other</option></select></label>
+        <label>Phone<input id="passenger-phone" placeholder="Phone number"></label>
+        <label>Email<input id="passenger-email" type="email" placeholder="you@example.com"></label>
+        <label class="wide">Passport / ID number<input id="passenger-passport" required maxlength="30" placeholder="Use demo data only"></label>
+        <label>Seat number<input id="seat-number" required maxlength="5" placeholder="e.g. 14A"></label>
+        <label>Travel class<select id="travel-class"><option value="ECONOMY">Economy</option><option value="BUSINESS">Business</option><option value="FIRST">First</option></select></label>
+      </div>
+      <p class="form-note">Educational demo only. Do not enter real passport or payment information.</p>
+      <div id="booking-error" class="error-message"></div>
+      <button class="button button-primary full-width" type="submit">Create booking <span>→</span></button>
+    </form>
+  </dialog>
+
+  <dialog id="payment-dialog" class="booking-dialog small-dialog">
+    <form id="payment-form" method="dialog">
+      <div class="dialog-top"><div><div class="eyebrow">DEMO CHECKOUT</div><h2>Confirm your booking</h2></div><button type="button" class="close-button" id="close-payment">×</button></div>
+      <div id="payment-summary" class="selected-flight"></div>
+      <input type="hidden" id="payment-booking-id">
+      <label>Payment method<select id="payment-method"><option value="UPI">UPI (simulated)</option><option value="CARD">Card (simulated)</option><option value="NET_BANKING">Net banking (simulated)</option></select></label>
+      <p class="form-note">No real money is charged. This records a simulated successful payment in MySQL.</p>
+      <div id="payment-error" class="error-message"></div>
+      <button class="button button-primary full-width" type="submit">Simulate payment & issue ticket <span>→</span></button>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
